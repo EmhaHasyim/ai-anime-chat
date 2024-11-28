@@ -1,11 +1,20 @@
 {
   "name": "ai-chat-anime",
-  "module": "index.ts",
+  "module": "Server/index.ts",
   "type": "module",
+  "scripts": {
+    "start": "bun run server/index.ts",
+    "dev": "bun run --hot server/index.ts"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@hono/zod-validator": "^0.4.1",
+    "hono": "^4.6.12",
+    "zod": "^3.23.8"
   }
 }
