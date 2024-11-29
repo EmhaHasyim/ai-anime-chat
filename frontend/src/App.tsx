@@ -1,6 +1,6 @@
 import {useState} from "react";
 import {Button} from "@/components/ui/button"
-import {AppType} from "../../Server";
+import {AppType} from "../../server";
 import {hc} from 'hono/client'
 
 const client = hc<AppType>('/')
