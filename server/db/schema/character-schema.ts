@@ -5,7 +5,7 @@ export const characterTable = pgTable('characters', {
     name: varchar({length: 255}).notNull(),
     description: varchar({length: 255}).notNull(),
     img: varchar({length: 255}).notNull(),
-    totalChat: bigint({mode: "number"}).notNull(),
+    totalChat: bigint({mode: "number"}).default(0).notNull(),
     aiCommand: text().notNull(),
 });
 

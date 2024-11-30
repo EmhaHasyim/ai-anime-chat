@@ -1,6 +1,7 @@
 import {Hono} from "hono";
 import {zValidator} from '@hono/zod-validator'
 import {characterValidationDelete, characterValidationPost} from "../validation/character-validation.ts";
+import {insertCharacter} from "../service/character-service.ts";
 
 const characterController = new Hono().basePath('/character')
     .get('/', (c) => {
@@ -30,11 +31,11 @@ const characterController = new Hono().basePath('/character')
     })
     .post('/', zValidator(
         'json', characterValidationPost
-    ), (c) => {
-
-        return c.json({
-            message: 'successes add character'
-        })
+    ), async (c) => {
+        const character = c.req.valid('json')
+        const insert = await insertCharacter(character)
+        if (!insert.success) return c.json(insert, 500)
+        return c.json(insert, 201)
     })
     .delete('/', zValidator(
         'json', characterValidationDelete
