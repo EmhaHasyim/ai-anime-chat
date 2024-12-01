@@ -19,4 +19,4 @@ const characterValidationDelete = z.object({
     id: z.number()
 })
 
-export {validateCharacterInsert, characterValidationDelete}
+export {validateCharacterInsert, characterValidationDelete, validateCharacterSelect}
