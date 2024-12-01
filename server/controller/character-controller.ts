@@ -1,33 +1,20 @@
 import {Hono} from "hono";
 import {zValidator} from '@hono/zod-validator'
-import {characterValidationDelete,validateCharacterInsert} from "../validation/character-validation.ts";
-import {insertCharacter} from "../service/character-service.ts";
+import {
+    characterValidationDelete,
+    validateCharacterInsert,
+    validateCharacterSelect
+} from "../validation/character-validation.ts";
+import {insertCharacter, selectCharacter} from "../service/character-service.ts";
 
 const characterController = new Hono().basePath('/character')
-    .get('/', (c) => {
-
-        return c.json({
-            character: [
-                {
-                    id: 1,
-                    name: 'Naruto',
-                    birthDay: 'October 10',
-                    bloodType: 'B',
-                    height: '174',
-                    img: 'https://random.imagecdn.app/800/1300',
-                    aiCommand: 'dummy data'
-                },
-                {
-                    id: 2,
-                    name: 'Naruto',
-                    birthDay: 'October 10',
-                    bloodType: 'B',
-                    height: '174',
-                    img: 'https://random.imagecdn.app/800/1300',
-                    aiCommand: 'dummy data'
-                }
-            ]
-        })
+    .get('', zValidator(
+        "query", validateCharacterSelect
+    ), async (c) => {
+        const query = c.req.valid('query')
+        const select = await selectCharacter(query)
+        if (!select.success) return c.json(select, 500)
+        return c.json(select, 200)
     })
     .post('/', zValidator(
         'json', validateCharacterInsert

@@ -1,8 +1,8 @@
 import {z} from "zod";
 
 const validateCharacterSelect = z.object({
-    sort: z.enum(['name', 'chat_count', 'newest']).optional(),
-    gender: z.enum(['male', 'female', 'both']).optional(),
+    sort: z.enum(['name', 'popular', 'latest']).optional(),
+    gender: z.enum(['male', 'female']).optional(),
     order: z.enum(['asc', 'desc']).optional(),
     name: z.string().optional()
 })
