@@ -4,6 +4,7 @@ export const characterTable = pgTable('characters', {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
     name: varchar({length: 255}).notNull(),
     description: varchar({length: 255}).notNull(),
+    gender: varchar({length: 6}).notNull(),
     img: varchar({length: 255}).notNull(),
     totalChat: bigint({mode: "number"}).default(0).notNull(),
     aiCommand: text().notNull(),

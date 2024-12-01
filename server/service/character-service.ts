@@ -2,12 +2,12 @@ import {characterTable} from "../db/schema/character-schema.ts";
 import type {CharacterModel} from "../model/character-model.ts";
 import db from "../db/db.ts";
 
-
 const insertCharacter = async (character: CharacterModel) => {
     try {
         const insert = await db.insert(characterTable).values({
             name: character.name,
             description: character.description,
+            gender: character.gender,
             img: character.img,
             aiCommand: character.aiCommand
         }).returning()
@@ -27,5 +27,6 @@ const insertCharacter = async (character: CharacterModel) => {
 
     }
 }
+
 
 export {insertCharacter}
