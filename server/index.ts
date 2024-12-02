@@ -2,8 +2,12 @@ import {Hono} from "hono";
 import characterController from "./controller/character-controller.ts";
 import {HTTPException} from "hono/http-exception";
 import {ZodError} from "zod";
+import {cors} from 'hono/cors'
+import {prettyJSON} from "hono/pretty-json";
 
 const app = new Hono()
+    .use(prettyJSON())
+    .use('/api/*', cors())
     .get('/api', c => c.text('api by hono🔥🔥🔥'))
     .route('/api', characterController)
     .onError(async (err, c) => {
