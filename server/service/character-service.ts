@@ -2,6 +2,7 @@ import {characterTable} from "../db/schema/character-schema.ts";
 import type {CharacterModel, CharacterSelectQuery} from "../model/character-model.ts";
 import {eq, asc, desc} from 'drizzle-orm';
 import db from "../db/db.ts";
+import {HTTPException} from "hono/http-exception";
 
 const selectCharacter = async (query: CharacterSelectQuery) => {
     const {sort, gender, order} = query;
@@ -35,54 +36,59 @@ const selectCharacter = async (query: CharacterSelectQuery) => {
             sortBy = characterTable.total_chat;
     }
 
-    try {
-        const select = await db.select()
-            .from(characterTable)
-            .where(gender ? eq(characterTable.gender, gender) : undefined)
-            .orderBy(orderBy(sortBy))
-            .execute()
+    const select = await db
+        .select()
+        .from(characterTable)
+        .where(gender ? eq(characterTable.gender, gender) : undefined)
+        .orderBy(orderBy(sortBy))
+        .execute()
 
-        return {
-            status: "success",
-            success: true,
-            message: "Character search successfully.",
-            data: select
-        }
-    } catch (err) {
-        return {
-            status: "error",
-            success: false,
-            message: "Gagal mendapatkan karakter",
-            error: err
-        }
+    return {
+        status: "success",
+        success: true,
+        message: "Character found successfully.",
+        data: select
     }
+
 }
 
 const insertCharacter = async (character: CharacterModel) => {
-    try {
-        const insert = await db.insert(characterTable).values({
+
+    const insert = await db
+        .insert(characterTable)
+        .values({
             name: character.name,
             description: character.description,
             gender: character.gender,
             img: character.img,
             ai_command: character.aiCommand
-        }).returning()
-        return {
-            status: "success",
-            success: true,
-            message: "Character added successfully.",
-            data: insert[0]
-        }
-    } catch (err) {
-        return {
-            status: "error",
-            success: false,
-            message: "Gagal menambahkan karakter. Silakan periksa data yang Anda masukkan. Atau Hubungi .....",
-            error: err
-        }
+        })
+        .returning()
 
+    return {
+        status: "success",
+        success: true,
+        message: "Character added successfully.",
+        data: insert[0]
+    }
+
+}
+
+const deleteCharacter = async (id: string) => {
+    const deleteC = await db
+        .delete(characterTable)
+        .where(eq(characterTable.id, id))
+        .returning()
+
+    if (deleteC.length === 0) {
+        throw new HTTPException(404, {message: "character not found"})
+    }
+
+    return {
+        success: true,
+        data: deleteC[0],
+        message: "Character deleted successfully.",
     }
 }
 
-
-export {insertCharacter, selectCharacter}
+export {insertCharacter, selectCharacter, deleteCharacter}

@@ -15,8 +15,11 @@ const validateCharacterInsert = z.object({
     aiCommand: z.string().min(1).max(500),
 })
 
-const characterValidationDelete = z.object({
-    id: z.number()
+
+const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-9][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+const validateCharacterDelete = z.object({
+    id: z.string().regex(uuidRegex, 'Invalid UUID format')
 })
 
-export {validateCharacterInsert, characterValidationDelete, validateCharacterSelect}
+export {validateCharacterInsert, validateCharacterDelete, validateCharacterSelect}

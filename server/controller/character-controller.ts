@@ -1,11 +1,11 @@
 import {Hono} from "hono";
 import {zValidator} from '@hono/zod-validator'
 import {
-    characterValidationDelete,
+    validateCharacterDelete,
     validateCharacterInsert,
     validateCharacterSelect
 } from "../validation/character-validation.ts";
-import {insertCharacter, selectCharacter} from "../service/character-service.ts";
+import {deleteCharacter, insertCharacter, selectCharacter} from "../service/character-service.ts";
 
 const characterController = new Hono().basePath('/character')
     .get('', zValidator(
@@ -16,7 +16,7 @@ const characterController = new Hono().basePath('/character')
         if (!select.success) return c.json(select, 500)
         return c.json(select, 200)
     })
-    .post('/', zValidator(
+    .post('', zValidator(
         'json', validateCharacterInsert
     ), async (c) => {
         const character = c.req.valid('json')
@@ -24,15 +24,15 @@ const characterController = new Hono().basePath('/character')
         if (!insert.success) return c.json(insert, 500)
         return c.json(insert, 201)
     })
-    .delete('/', zValidator(
-        'json', characterValidationDelete
+    .delete('', zValidator(
+        'json', validateCharacterDelete
     ), async (c) => {
         const data = await c.req.json()
         const id = data.id
 
-        return c.json({
-            message: `successes delete character ${id}`
-        })
+        const deleteC = await deleteCharacter(id)
+
+        return c.json(deleteC, 200)
     })
 
 
