@@ -1,7 +1,8 @@
-import {Pool} from '@neondatabase/serverless';
-import {drizzle} from 'drizzle-orm/neon-serverless';
+import 'dotenv/config';
+import { drizzle } from 'drizzle-orm/bun-sqlite';
+import { Database } from 'bun:sqlite';
 
-const pool = new Pool({connectionString: process.env.DATABASE_URL});
-const db = drizzle({client: pool})
+const sqlite = new Database(process.env.DB_FILE_NAME!);
+const db = drizzle({ client: sqlite });
 
 export default db
