@@ -3,7 +3,8 @@ import {zValidator} from '@hono/zod-validator'
 import {
     validateCharacterDelete,
     validateCharacterInsert,
-    validateCharacterSelect
+    validateCharacterSelect,
+    validateCharacterUpdate
 } from "../validation/character-validation.ts";
 import {deleteCharacter, insertCharacter, selectCharacter} from "../service/character-service.ts";
 
@@ -23,6 +24,13 @@ const characterController = new Hono().basePath('/character')
         const insert = await insertCharacter(character)
         if (!insert.success) return c.json(insert, 500)
         return c.json(insert, 201)
+    })
+    .put('', zValidator(
+        'json', validateCharacterUpdate
+    ), async (c) => {
+        const character = c.req.valid('json')
+
+        return c.json({})
     })
     .delete('', zValidator(
         'json', validateCharacterDelete

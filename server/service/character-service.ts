@@ -74,6 +74,25 @@ const insertCharacter = async (character: CharacterModel) => {
 
 }
 
+const updateCharacter = async (character: CharacterModel) => {
+
+    const update = await db
+        .update(characterTable)
+        .set({
+            name: character.name,
+            description: character.description,
+            gender: character.gender,
+            img: character.img,
+            ai_command: character.aiCommand
+        })
+        .where(eq(characterTable.id , `${character.id}`))
+        .returning()
+
+    return {
+        data: update
+    }
+}
+
 const deleteCharacter = async (id: string) => {
     const deleteC = await db
         .delete(characterTable)
