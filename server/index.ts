@@ -14,17 +14,23 @@ const app = new Hono()
         if (err instanceof HTTPException) {
             c.status(err.status)
             return c.json({
-                errors: err.message
+                errors: {
+                    message: err.message
+                }
             })
         } else if (err instanceof ZodError) {
             c.status(400)
             return c.json({
-                errors: err.message
+                errors: {
+                    message: err.message
+                }
             })
         } else {
             c.status(500)
             return c.json({
-                errors: err.message
+                errors: {
+                    message: err.message
+                }
             })
         }
     })

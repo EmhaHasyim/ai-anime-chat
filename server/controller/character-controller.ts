@@ -6,7 +6,7 @@ import {
     validateCharacterSelect,
     validateCharacterUpdate
 } from "../validation/character-validation.ts";
-import {deleteCharacter, insertCharacter, selectCharacter} from "../service/character-service.ts";
+import {deleteCharacter, insertCharacter, selectCharacter, updateCharacter} from "../service/character-service.ts";
 
 const characterController = new Hono().basePath('/character')
     .get('', zValidator(
@@ -14,7 +14,6 @@ const characterController = new Hono().basePath('/character')
     ), async (c) => {
         const query = c.req.valid('query')
         const select = await selectCharacter(query)
-        if (!select.success) return c.json(select, 500)
         return c.json(select, 200)
     })
     .post('', zValidator(
@@ -22,21 +21,20 @@ const characterController = new Hono().basePath('/character')
     ), async (c) => {
         const character = c.req.valid('json')
         const insert = await insertCharacter(character)
-        if (!insert.success) return c.json(insert, 500)
         return c.json(insert, 201)
     })
     .put('', zValidator(
         'json', validateCharacterUpdate
     ), async (c) => {
         const character = c.req.valid('json')
+        const update = await updateCharacter(character)
 
-        return c.json({})
+        return c.json(update, 200)
     })
     .delete('', zValidator(
         'json', validateCharacterDelete
     ), async (c) => {
-        const data = await c.req.json()
-        const id = data.id
+        const id = c.req.valid('json')
 
         const deleteC = await deleteCharacter(id)
 
