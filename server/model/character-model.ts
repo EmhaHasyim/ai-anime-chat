@@ -1,8 +1,19 @@
-type CharacterSelectQuery = {
-    sort?: string;
-    gender?: string;
-    order?: string;
-}
+import {z} from "zod";
+import {
+    validateCharacterDelete,
+    validateCharacterInsert,
+    validateCharacterSelect,
+    validateCharacterUpdate
+} from "../validation/character-validation.ts";
+
+type CharacterSelect = z.infer<typeof validateCharacterSelect>
+
+type CharacterInsert = z.infer<typeof validateCharacterInsert>
+
+type CharacterUpdate = z.infer<typeof validateCharacterUpdate>
+
+type CharacterDelete = z.infer<typeof validateCharacterDelete>
+
 
 type CharacterModel = {
     id?: number;
@@ -14,4 +25,4 @@ type CharacterModel = {
     aiCommand: string;
 };
 
-export type {CharacterModel, CharacterSelectQuery}
+export type {CharacterModel, CharacterSelect, CharacterInsert, CharacterUpdate, CharacterDelete}

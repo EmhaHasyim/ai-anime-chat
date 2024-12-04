@@ -15,7 +15,6 @@ const validateCharacterInsert = z.object({
     aiCommand: z.string().min(1).max(500),
 })
 
-
 const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-9][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 const validateCharacterUpdate = z.object({

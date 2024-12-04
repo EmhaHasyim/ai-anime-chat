@@ -1,10 +1,15 @@
-import {characterTable} from "../db/schema/character-schema.ts";
-import type {CharacterModel, CharacterSelectQuery} from "../model/character-model.ts";
+import characterTable from '../db/schema/character-schema.ts'
+import type {
+    CharacterSelect,
+    CharacterInsert,
+    CharacterUpdate,
+    CharacterDelete
+} from "../model/character-model.ts";
 import {eq, asc, desc} from 'drizzle-orm';
 import db from "../db/db.ts";
-import {HTTPException} from "hono/http-exception";
+import {HTTPException} from "hono/http-exception"
 
-const selectCharacter = async (query: CharacterSelectQuery) => {
+const selectCharacter = async (query: CharacterSelect) => {
     const {sort, gender, order} = query;
 
     let orderBy;
@@ -25,15 +30,15 @@ const selectCharacter = async (query: CharacterSelectQuery) => {
         case 'name':
             sortBy = characterTable.name;
             break;
-        case 'popularity':
-            sortBy = characterTable.total_chat;
+        case 'popular':
+            sortBy = characterTable.totalChat;
             break;
         case 'latest':
-            sortBy = characterTable.created_at;
+            sortBy = characterTable.createdAt;
             orderBy = orderBy === asc ? desc : asc
             break;
         default:
-            sortBy = characterTable.total_chat;
+            sortBy = characterTable.totalChat;
     }
 
     const select = await db
@@ -43,71 +48,71 @@ const selectCharacter = async (query: CharacterSelectQuery) => {
         .orderBy(orderBy(sortBy))
         .execute()
 
+    if (select.length === 0) throw new HTTPException(404, {message: "character not found"})
+
     return {
-        status: "success",
-        success: true,
-        message: "Character found successfully.",
         data: select
     }
 
 }
 
-const insertCharacter = async (character: CharacterModel) => {
+const insertCharacter = async (character: CharacterInsert) => {
+
+    const {name, description, gender, img, aiCommand} = character
 
     const insert = await db
         .insert(characterTable)
         .values({
-            name: character.name,
-            description: character.description,
-            gender: character.gender,
-            img: character.img,
-            ai_command: character.aiCommand
+            name: name,
+            description: description,
+            gender: gender,
+            img: img,
+            aiCommand: aiCommand
         })
         .returning()
 
     return {
-        status: "success",
-        success: true,
-        message: "Character added successfully.",
-        data: insert[0]
+        data: insert
     }
 
 }
 
-const updateCharacter = async (character: CharacterModel) => {
+const updateCharacter = async (character: CharacterUpdate) => {
+
+    const {name, description, gender, img, aiCommand} = character
 
     const update = await db
         .update(characterTable)
         .set({
-            name: character.name,
-            description: character.description,
-            gender: character.gender,
-            img: character.img,
-            ai_command: character.aiCommand
+            name: name,
+            description: description,
+            gender: gender,
+            img: img,
+            aiCommand: aiCommand
         })
-        .where(eq(characterTable.id , `${character.id}`))
+        .where(eq(characterTable.id, `${character.id}`))
         .returning()
 
+    if (update.length === 0) throw new HTTPException(404, {message: "character not found"})
+
+    console.info(update)
     return {
         data: update
     }
 }
 
-const deleteCharacter = async (id: string) => {
+const deleteCharacter = async (id: CharacterDelete) => {
+
     const deleteC = await db
         .delete(characterTable)
-        .where(eq(characterTable.id, id))
+        .where(eq(characterTable.id, id.id))
         .returning()
 
-    if (deleteC.length === 0) {
-        throw new HTTPException(404, {message: "character not found"})
-    }
+    if (deleteC.length === 0) throw new HTTPException(404, {message: "character not found"})
 
     return {
-        success: true,
-        data: deleteC[0],
-        message: "Character deleted successfully.",
+        data: deleteC
     }
 }
 
-export {insertCharacter, selectCharacter, deleteCharacter}
+export {insertCharacter, selectCharacter, deleteCharacter, updateCharacter}
