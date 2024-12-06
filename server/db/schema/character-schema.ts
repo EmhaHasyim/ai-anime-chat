@@ -1,10 +1,9 @@
 import { text, integer, sqliteTable } from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
-import { randomUUIDv7 } from "bun";
 
 const characterTable = sqliteTable('characters', {
-    id: text().primaryKey().$defaultFn(() => randomUUIDv7()),
-    name: text().notNull().unique(),
+    id: text().primaryKey().$defaultFn(() => Bun.randomUUIDv7()),
+    name: text().notNull(),
     description: text().notNull(),
     gender: text().notNull(),
     img: text().notNull(),
