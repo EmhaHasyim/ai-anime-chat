@@ -1,12 +1,14 @@
 import {Hono} from "hono";
 import {zValidator} from '@hono/zod-validator'
+import constructImageUrl from "../utils/constructImageUrl.ts";
 import {
-    validateCharacterDelete,
-    validateCharacterInsert,
+    validateCharacterDelete, validateCharacterImage,
     validateCharacterSelect,
     validateCharacterUpdate
 } from "../validation/character-validation.ts";
 import {deleteCharacter, insertCharacter, selectCharacter, updateCharacter} from "../service/character-service.ts";
+import saveImage from "../utils/saveImage.ts";
+import {join} from 'path';
 
 const characterController = new Hono().basePath('/character')
     .get('', zValidator(
@@ -16,19 +18,27 @@ const characterController = new Hono().basePath('/character')
         const select = await selectCharacter(query)
         return c.json(select, 200)
     })
-    .post('', zValidator(
-        'json', validateCharacterInsert
-    ), async (c) => {
-        const character = c.req.valid('json')
-        const insert = await insertCharacter(character)
+    .post('', zValidator('form', validateCharacterImage), async (c) => {
+
+        const {image, character} = c.req.valid('form');
+        const uploadDir = join(process.cwd(), 'public', 'images');
+        await saveImage(image, uploadDir)
+        const imageUrl = `/images/${image.name}`;
+        const fullUrl = constructImageUrl(c, imageUrl);
+
+        const insert = await insertCharacter(character, fullUrl)
         return c.json(insert, 201)
     })
     .put('', zValidator(
-        'json', validateCharacterUpdate
+        'form', validateCharacterUpdate
     ), async (c) => {
-        const character = c.req.valid('json')
-        const update = await updateCharacter(character)
+        const {id, character, image} = c.req.valid('form')
+        const uploadDir = join(process.cwd(), 'public', 'images');
+        await saveImage(image, uploadDir)
+        const imageUrl = `/images/${image.name}`;
+        const fullUrl = constructImageUrl(c, imageUrl);
 
+        const update = await updateCharacter(character, id, fullUrl)
         return c.json(update, 200)
     })
     .delete('', zValidator(

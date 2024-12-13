@@ -2,12 +2,13 @@ import characterTable from '../db/schema/character-schema.ts'
 import type {
     CharacterSelect,
     CharacterInsert,
-    CharacterUpdate,
     CharacterDelete
 } from "../model/character-model.ts";
 import {eq, asc, desc} from 'drizzle-orm';
 import db from "../db/db.ts";
 import {HTTPException} from "hono/http-exception"
+
+
 
 const selectCharacter = async (query: CharacterSelect) => {
     const {sort, gender, order} = query;
@@ -56,9 +57,9 @@ const selectCharacter = async (query: CharacterSelect) => {
 
 }
 
-const insertCharacter = async (character: CharacterInsert) => {
+const insertCharacter = async (character: CharacterInsert, imageUrl: string) => {
 
-    const {name, description, gender, img, aiCommand} = character
+    const {name, description, gender, aiCommand} = character
 
     const insert = await db
         .insert(characterTable)
@@ -66,7 +67,7 @@ const insertCharacter = async (character: CharacterInsert) => {
             name: name,
             description: description,
             gender: gender,
-            img: img,
+            img: imageUrl,
             aiCommand: aiCommand
         })
         .returning()
@@ -77,9 +78,10 @@ const insertCharacter = async (character: CharacterInsert) => {
 
 }
 
-const updateCharacter = async (character: CharacterUpdate) => {
+const updateCharacter = async (character: CharacterInsert,id: string, imageUrl: string) => {
+    console.log(id)
 
-    const {name, description, gender, img, aiCommand} = character
+    const {name, description, gender, aiCommand} = character
 
     const update = await db
         .update(characterTable)
@@ -87,10 +89,10 @@ const updateCharacter = async (character: CharacterUpdate) => {
             name: name,
             description: description,
             gender: gender,
-            img: img,
+            img: imageUrl,
             aiCommand: aiCommand
         })
-        .where(eq(characterTable.id, `${character.id}`))
+        .where(eq(characterTable.id, `${id}`))
         .returning()
 
     if (update.length === 0) throw new HTTPException(404, {message: "character not found"})
